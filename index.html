@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Click2Care</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono:wght@400&family=VT323&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style3.css" />
+  </head>
+  <body>
+    <div class="crt-monitor">
+      <div class="screen-bezel">
+        <div class="screen-content">
+          <!-- CRT Effects -->
+          <div class="scanlines"></div>
+          <div class="screen-flicker"></div>
+
+          <div class="dashboard">
+            <!-- Left Sidebar -->
+            <aside class="sidebar">
+              <div class="logo">
+                <div class="logo-icon">
+                  <div class="pixel-heart">
+                    <div class="heart-pixel"></div>
+                    <div class="heart-pixel"></div>
+                    <div class="heart-pixel"></div>
+                    <div class="heart-pixel"></div>
+                  </div>
+                </div>
+                <div class="logo-text">C2C</div>
+              </div>
+
+              <nav class="nav-menu">
+                <button class="nav-item active" data-tooltip="DASHBOARD">
+                  <div class="nav-icon">
+                    <div class="pixel-icon dashboard-icon">
+                      <div class="icon-pixel"></div>
+                      <div class="icon-pixel"></div>
+                      <div class="icon-pixel"></div>
+                      <div class="icon-pixel"></div>
+                    </div>
+                  </div>
+                  <span class="nav-label">DASH</span>
+                </button>
+
+                <button class="nav-item" data-tooltip="HEART MONITOR">
+                  <div class="nav-icon">
+                    <div class="pixel-icon heart-icon">
+                      <div class="icon-pixel pulse"></div>
+                      <div class="icon-pixel pulse"></div>
+                      <div class="icon-pixel pulse"></div>
+                    </div>
+                  </div>
+                  <span class="nav-label">HEART</span>
+                </button>
+
+                <button class="nav-item" data-tooltip="BREATH ANALYSIS">
+                  <div class="nav-icon">
+                    <div class="pixel-icon breath-icon">
+                      <div class="icon-pixel wave"></div>
+                      <div class="icon-pixel wave"></div>
+                      <div class="icon-pixel wave"></div>
+                    </div>
+                  </div>
+                  <span class="nav-label">BREATH</span>
+                </button>
+
+                <button class="nav-item" data-tooltip="PATIENT RECORDS">
+                  <div class="nav-icon">
+                    <div class="pixel-icon records-icon">
+                      <div class="icon-pixel"></div>
+                      <div class="icon-pixel"></div>
+                      <div class="icon-pixel"></div>
+                    </div>
+                  </div>
+                  <span class="nav-label">DATA</span>
+                </button>
+
+                <button class="nav-item" data-tooltip="SETTINGS">
+                  <div class="nav-icon">
+                    <div class="pixel-icon settings-icon">
+                      <div class="icon-pixel rotate"></div>
+                      <div class="icon-pixel rotate"></div>
+                    </div>
+                  </div>
+                  <span class="nav-label">CONFIG</span>
+                </button>
+
+                <button class="nav-item power-nav" data-tooltip="POWER">
+                  <div class="nav-icon">
+                    <div class="pixel-icon power-icon">
+                      <div class="icon-pixel"></div>
+                    </div>
+                  </div>
+                  <span class="nav-label">PWR</span>
+                </button>
+              </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="main-content">
+              <header class="header">
+                <div class="header-left">
+                  <h1 class="app-title">Click2Care</h1>
+                  <div class="system-info">
+                    <span class="version">v3.0</span>
+                    <span class="separator">|</span>
+                    <span class="date">MARCH 2024</span>
+                  </div>
+                </div>
+                <div class="header-controls">
+                  <button class="pixel-btn theme-toggle" title="TOGGLE THEME">
+                    <span class="btn-text">THEME</span>
+                    <div class="btn-led"></div>
+                  </button>
+                  <button class="pixel-btn power-btn" title="POWER ON/OFF">
+                    <span class="btn-text">POWER</span>
+                    <div class="btn-led power-led"></div>
+                  </button>
+                  <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span class="status-text">SYSTEM READY</span>
+                  </div>
+                </div>
+              </header>
+
+              <div class="content-grid">
+                <!-- Analysis Box -->
+                <section class="analysis-box">
+                  <div class="panel-header">
+                    <h2 class="panel-title">AI DIAGNOSIS</h2>
+                    <div class="panel-status">
+                      <div class="status-led active"></div>
+                      <span>ANALYZING</span>
+                    </div>
+                  </div>
+                  <div class="panel-body">
+                    <div class="diagnosis-display">
+                      <div class="terminal-screen">
+                        <div class="terminal-line">
+                          <span class="prompt">></span>
+                          <span class="text">SYSTEM READY</span>
+                        </div>
+                        <div class="terminal-line">
+                          <span class="prompt">></span>
+                          <span class="text">AWAITING INPUT...</span>
+                        </div>
+                        <div class="terminal-line">
+                          <span class="prompt">></span>
+                          <span class="text">POWER ON TO BEGIN</span>
+                        </div>
+                        <div class="terminal-line">
+                          <span class="prompt">></span>
+                          <span class="text">MONITORING</span>
+                        </div>
+                        <div class="terminal-line current">
+                          <span class="prompt">></span>
+                          <span class="text" id="diagnosisText">STANDBY_</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="alert-section hidden">
+                      <div class="alert-indicator">
+                        <div class="alert-icon">⚠</div>
+                        <p class="alert-message">PATIENT CRITICAL</p>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- Combined Heart & Mood Section (Section 2) -->
+                <section class="graph-section combined-section">
+                  <div class="panel-header">
+                    <h2 class="panel-title">ECG MONITOR</h2>
+                    <div class="graph-controls">
+                      <button class="pixel-btn control-btn start-btn">
+                        <span class="btn-text">START</span>
+                      </button>
+                      <button class="pixel-btn control-btn reset-btn">
+                        <span class="btn-text">RESET</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="panel-body">
+                    <div class="combined-layout" id="heartCombinedCard">
+                      <div class="combined-left">
+                        <div class="graph-container">
+                          <div class="crt-screen">
+                            <canvas
+                              id="ecgCanvas"
+                              width="600"
+                              height="200"
+                            ></canvas>
+                            <div class="screen-grid"></div>
+                            <div class="graph-overlay">
+                              <div class="bpm-display">
+                                <span class="bpm-label">BPM:</span>
+                                <span class="bpm-value" id="bpmValue">--</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="graph-message">
+                            <span id="graphMessage">CLICK ANYWHERE IN THIS CARD TO GENERATE HEARTBEAT</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="combined-right">
+                        <!-- Heart Rate Card (unchanged design) -->
+                        <div class="vital-card bpm-card">
+                          <div class="card-header">
+                            <h3 class="card-title">HEART RATE</h3>
+                            <div class="card-icon">
+                              <div class="pixel-heart-small">
+                                <div class="heart-beat-pixel"></div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="card-body">
+                            <div class="vital-display">
+                              <div class="vital-value">
+                                <span class="value" id="heartRate">--</span>
+                                <span class="unit">BPM</span>
+                              </div>
+                              <div class="vital-bars">
+                                <div class="bar" data-level="1"></div>
+                                <div class="bar" data-level="2"></div>
+                                <div class="bar" data-level="3"></div>
+                                <div class="bar" data-level="4"></div>
+                                <div class="bar" data-level="5"></div>
+                              </div>
+                            </div>
+                            <div class="vital-status" id="heartStatus">WAITING...</div>
+                          </div>
+                        </div>
+
+                        <!-- Patient Mood Card -->
+                        <div class="vital-card mood-card">
+                          <div class="card-header">
+                            <h3 class="card-title">PATIENT MOOD</h3>
+                            <div class="card-icon">
+                              <div class="pixel-face" id="moodIcon">
+                                <div class="face-pixel eye"></div>
+                                <div class="face-pixel eye"></div>
+                                <div class="face-pixel mouth"></div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="card-body">
+                            <div class="vital-display">
+                              <div class="vital-value">
+                                <span class="value mood-text" id="moodValue">NEUTRAL</span>
+                              </div>
+                              <div class="mood-indicator">
+                                <div class="mood-bar good"></div>
+                                <div class="mood-bar ok"></div>
+                                <div class="mood-bar bad"></div>
+                              </div>
+                            </div>
+                            <div class="vital-status" id="moodStatus">BASED ON VITALS</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="diagnosis-actions">
+                      <input type="file" id="photoUpload" accept="image/*" class="hidden" />
+                      <div class="actions-row">
+                        <button class="pixel-btn" id="uploadPhotoBtn" title="UPLOAD PHOTO">
+                          <span class="btn-text">UPLOAD PHOTO</span>
+                        </button>
+                        <button class="pixel-btn" id="printDeathCert" title="PRINT CERTIFICATE" style="display:none;">
+                          <span class="btn-text">PRINT CERT</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- Vitals Section (Section 3 - Breath only) -->
+                <section class="vitals-section">
+                  <!-- Breath Quality Card (expanded) -->
+                  <div class="vital-card breath-card">
+                    <div class="card-header">
+                      <h3 class="card-title">BREATH QUALITY</h3>
+                      <div class="card-icon">
+                        <div class="pixel-lungs">
+                          <div class="lung-pixel"></div>
+                          <div class="lung-pixel"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <div class="vital-display">
+                        <div class="vital-value">
+                          <span class="value" id="breathQuality">--</span>
+                          <span class="unit">%</span>
+                        </div>
+                        <div class="vital-bars">
+                          <div class="bar" data-level="1"></div>
+                          <div class="bar" data-level="2"></div>
+                          <div class="bar" data-level="3"></div>
+                          <div class="bar" data-level="4"></div>
+                          <div class="bar" data-level="5"></div>
+                        </div>
+                      </div>
+                      <div class="vital-status" id="breathStatus">
+                        NO INPUT DETECTED
+                      </div>
+                      <div class="breath-controls">
+                        <button class="pixel-btn mic-btn" id="micToggle">
+                          <span class="btn-text">MIC OFF</span>
+                          <div class="btn-led"></div>
+                        </button>
+                        <div class="breath-extra-controls">
+                          <button class="pixel-btn breath-start"><span class="btn-text">START LISTEN</span></button>
+                          <button class="pixel-btn breath-stop"><span class="btn-text">STOP LISTEN</span></button>
+                        </div>
+                        <div class="breath-recognition" id="breathRecognition">RECOGNITION: --</div>
+                        <div class="breath-graph">
+                          <canvas id="breathCanvas" width="300" height="100"></canvas>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              </div>
+
+              <!-- Footer -->
+              <footer class="footer">
+                <div class="footer-info">
+                  <span class="system-name">RETRO MEDTERM v3.0</span>
+                  <span class="separator">|</span>
+                  <span class="uptime"
+                    >UPTIME: <span id="uptime">00:00:00</span></span
+                  >
+                  <span class="separator">|</span>
+                  <span class="connection">LOCALHOST</span>
+                </div>
+                <div class="footer-commands">
+                  <span class="command">F1:HELP</span>
+                  <span class="command">F2:SAVE</span>
+                  <span class="command">ESC:EMERGENCY</span>
+                </div>
+              </footer>
+            </main>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alert Modal -->
+    <div class="pixel-modal hidden" id="alertModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="modal-title">SYSTEM ALERT</span>
+          <button class="pixel-btn close-btn" onclick="closeAlert()">
+            <span class="btn-text">X</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="alert-display">
+            <div class="alert-icon-large">⚠</div>
+            <div class="alert-text" id="alertText">CRITICAL ERROR DETECTED</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            class="pixel-btn acknowledge-btn"
+            onclick="acknowledgeAlert()"
+          >
+            <span class="btn-text">ACKNOWLEDGE</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Session Toast -->
+    <div class="pixel-modal hidden" id="toastModal">
+      <div class="modal-content" style="border-color:#00ff41; max-width: 420px;">
+        <div class="modal-header" style="border-bottom-color:#00ff41;">
+          <span class="modal-title" id="toastTitle">SESSION</span>
+          <button class="pixel-btn close-btn" onclick="closeToast()">
+            <span class="btn-text">X</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="alert-display">
+            <div class="alert-text" id="toastText">SESSION MESSAGE</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="pixel-btn acknowledge-btn" onclick="closeToast()">
+            <span class="btn-text">OK</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="script3.js"></script>
+  </body>
+</html>

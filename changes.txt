@@ -1,0 +1,9 @@
+ - Removed outer curved container visuals; main UI now fills full screen (updated `.crt-monitor`, `.screen-bezel`, `.screen-content`).
+ - Kept Section 1 (AI panel) unchanged.
+ - Merged Section 2 into a single combined card: ECG + Heart Rate card + Patient Mood card; the merged card handles heartbeat clicks (added `#heartCombinedCard` and combined layout markup).
+ - Section 3 now dedicated to breath: expanded breath card area; added breath extra controls, recognition text, and a mini breath graph (`#breathCanvas`).
+ - Added CSS for combined layout and breath extras; adjusted responsive rules and spacing for balanced layout.
+ - Preserved heart rate card design; no style changes inside it.
+ - Wired combined card click to trigger heart monitoring; added handlers for breath start/stop; extended breath display to render recognition and mini graph.
+ - Ensured full-width/height scaling; fixed alignment by removing outer borders/radii and tuning grid sizing.
+
