@@ -373,7 +373,7 @@ class RetroPatientMonitor {
             photoUpload.addEventListener('change', (e) => this.handlePhotoUpload(e));
         }
         if (printDeathCert) {
-            printDeathCert.addEventListener('click', () => this.printCertificate());
+            printDeathCert.addEventListener('click', () => this.generateDeathCertificate());
         }
 
         // Combined Heart + Mood Card (Section 2) click handler
@@ -1455,6 +1455,10 @@ DAYS LEFT: ${daysLeft}`;
         if (statusText) {
             statusText.textContent = 'SYSTEM ONLINE';
         }
+        
+        // Show print death certificate button after session completion
+        const printBtn = document.getElementById('printDeathCert');
+        if (printBtn) printBtn.style.display = 'inline-flex';
     }
     
     /**
@@ -1893,7 +1897,7 @@ DAYS LEFT: ${daysLeft}`;
     }
 
     /**
-     * Handle photo upload for session documentation
+     * Handle photo upload for death certificate generation
      * @param {Event} event - File input change event
      */
     handlePhotoUpload(event) {
@@ -1904,39 +1908,304 @@ DAYS LEFT: ${daysLeft}`;
         reader.onload = (e) => {
             this.sessionPhotoDataUrl = e.target.result;
             this.playFeedback('success');
-            this.updateDiagnosis('PHOTO UPLOADED_');
+            this.updateDiagnosis('PHOTO UPLOADED - GENERATING CERTIFICATE_');
+            
+            // Automatically generate the death certificate after photo upload
+            setTimeout(() => {
+                this.generateDeathCertificate();
+            }, 1000);
         };
         reader.readAsDataURL(file);
     }
 
-    printCertificate() {
-        const w = window.open('', 'CERT');
-        if (!w) return;
-        const now = new Date().toLocaleString();
-        const mood = this.patientMood;
-        const bpm = this.currentBPM || '--';
-        const breath = this.breathQuality || '--';
-        const imgTag = this.sessionPhotoDataUrl ? `<img src="${this.sessionPhotoDataUrl}" style="max-width:200px;display:block;margin:12px 0;"/>` : '';
-        w.document.write(`
-          <html><head><title>Death Certificate</title>
-          <style>
-            body{ font-family: Arial, sans-serif; padding: 24px; }
-            h1{ margin: 0 0 8px; }
-            .meta{ color:#444; margin-bottom: 16px; }
-            .box{ border:1px solid #222; padding:12px; margin-top:12px; }
-          </style>
-          </head><body>
-            <h1>Death Certificate (Parody)</h1>
-            <div class=\"meta\">Generated: ${now}</div>
-            ${imgTag}
-            <div class=\"box\">Heartbeat (BPM): ${bpm}</div>
-            <div class=\"box\">Breath Quality: ${breath}%</div>
-            <div class=\"box\">Mood: ${mood}</div>
-            <p>This certificate is generated for demonstration purposes only.</p>
-            <script>window.onload=()=>window.print();<\\/script>
-          </body></html>
-        `);
-        w.document.close();
+    /**
+     * Generate comprehensive death certificate PDF with patient data
+     */
+    generateDeathCertificate() {
+        if (!this.sessionPhotoDataUrl) {
+            this.showAlert('ERROR', 'Please upload a photo first');
+            this.playFeedback('error');
+            return;
+        }
+
+        // Get current session data or create default values
+        const session = this.currentSession || {
+            heartScore: this.currentBPM || 0,
+            breathScore: this.breathQuality || 0,
+            finalScore: 0,
+            daysLeft: 'N/A',
+            resultMessage: 'NO SESSION DATA'
+        };
+
+        // Calculate final score if not available
+        if (!session.finalScore) {
+            session.finalScore = Math.round((session.heartScore / 60) * 60 + (session.breathScore / 100) * 40);
+        }
+
+        // Calculate days left if not available
+        if (session.daysLeft === 'N/A') {
+            if (session.finalScore < RetroPatientMonitor.DIAGNOSIS_VERY_LOW) {
+                session.daysLeft = '7-30';
+            } else if (session.finalScore < RetroPatientMonitor.DIAGNOSIS_LOW) {
+                session.daysLeft = '30-90';
+            } else if (session.finalScore < RetroPatientMonitor.DIAGNOSIS_AVERAGE) {
+                session.daysLeft = '90-365';
+            } else {
+                session.daysLeft = '1000+';
+            }
+        }
+
+        const now = new Date();
+        const certificateDate = now.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        const certificateTime = now.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        // Create the certificate HTML
+        const certificateHTML = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Death Certificate - Click2Care</title>
+            <style>
+                @page {
+                    size: A4;
+                    margin: 20mm;
+                }
+                body {
+                    font-family: 'Courier New', monospace;
+                    font-size: 12px;
+                    line-height: 1.4;
+                    color: #000;
+                    background: #fff;
+                    margin: 0;
+                    padding: 20px;
+                }
+                .certificate {
+                    border: 3px solid #000;
+                    padding: 30px;
+                    position: relative;
+                    min-height: 800px;
+                }
+                .header {
+                    text-align: center;
+                    border-bottom: 2px solid #000;
+                    padding-bottom: 20px;
+                    margin-bottom: 30px;
+                }
+                .title {
+                    font-size: 24px;
+                    font-weight: bold;
+                    margin: 0;
+                    text-transform: uppercase;
+                }
+                .subtitle {
+                    font-size: 14px;
+                    margin: 10px 0 0 0;
+                    color: #666;
+                }
+                .photo-section {
+                    text-align: center;
+                    margin: 20px 0;
+                }
+                .patient-photo {
+                    max-width: 200px;
+                    max-height: 200px;
+                    border: 2px solid #000;
+                }
+                .data-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 20px;
+                    margin: 30px 0;
+                }
+                .data-section {
+                    border: 1px solid #000;
+                    padding: 15px;
+                }
+                .section-title {
+                    font-weight: bold;
+                    font-size: 14px;
+                    text-transform: uppercase;
+                    border-bottom: 1px solid #000;
+                    padding-bottom: 5px;
+                    margin-bottom: 10px;
+                }
+                .data-row {
+                    display: flex;
+                    justify-content: space-between;
+                    margin: 8px 0;
+                }
+                .data-label {
+                    font-weight: bold;
+                }
+                .data-value {
+                    text-align: right;
+                }
+                .critical-info {
+                    background: #f0f0f0;
+                    border: 2px solid #000;
+                    padding: 20px;
+                    margin: 20px 0;
+                    text-align: center;
+                }
+                .days-left {
+                    font-size: 18px;
+                    font-weight: bold;
+                    color: #d00;
+                    margin: 10px 0;
+                }
+                .footer {
+                    margin-top: 40px;
+                    text-align: center;
+                    font-size: 10px;
+                    color: #666;
+                    border-top: 1px solid #000;
+                    padding-top: 20px;
+                }
+                .stamp {
+                    position: absolute;
+                    top: 50px;
+                    right: 50px;
+                    border: 2px solid #d00;
+                    padding: 10px;
+                    transform: rotate(15deg);
+                    background: #fff;
+                }
+                .stamp-text {
+                    font-size: 12px;
+                    font-weight: bold;
+                    color: #d00;
+                    text-transform: uppercase;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="certificate">
+                <div class="stamp">
+                    <div class="stamp-text">Click2Care</div>
+                    <div class="stamp-text">v3.0</div>
+                </div>
+                
+                <div class="header">
+                    <h1 class="title">Death Certificate</h1>
+                    <p class="subtitle">Click2Care Medical Terminal - Retro Patient Monitor</p>
+                    <p>Generated on ${certificateDate} at ${certificateTime}</p>
+                </div>
+
+                <div class="photo-section">
+                    <img src="${this.sessionPhotoDataUrl}" class="patient-photo" alt="Patient Photo" />
+                    <p><strong>Patient Photograph</strong></p>
+                </div>
+
+                <div class="critical-info">
+                    <div class="section-title">Prognosis Summary</div>
+                    <div class="days-left">DAYS LEFT TO LIVE: ${session.daysLeft}</div>
+                    <p><strong>Final Diagnosis:</strong> ${session.resultMessage.toUpperCase()}</p>
+                </div>
+
+                <div class="data-grid">
+                    <div class="data-section">
+                        <div class="section-title">Heart Condition</div>
+                        <div class="data-row">
+                            <span class="data-label">Heart Score:</span>
+                            <span class="data-value">${session.heartScore}/60</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Current BPM:</span>
+                            <span class="data-value">${this.currentBPM || '--'}</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Heart Status:</span>
+                            <span class="data-value">${this.getHeartStatus(session.heartScore)}</span>
+                        </div>
+                    </div>
+
+                    <div class="data-section">
+                        <div class="section-title">Breath Condition</div>
+                        <div class="data-row">
+                            <span class="data-label">Breath Score:</span>
+                            <span class="data-value">${session.breathScore}/40</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Breath Quality:</span>
+                            <span class="data-value">${this.breathQuality || '--'}%</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Breath Status:</span>
+                            <span class="data-value">${this.getBreathStatus(session.breathScore)}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="data-section">
+                    <div class="section-title">Overall Assessment</div>
+                    <div class="data-row">
+                        <span class="data-label">Final Score:</span>
+                        <span class="data-value">${session.finalScore}/100</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Patient Mood:</span>
+                        <span class="data-value">${this.patientMood || 'UNKNOWN'}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Recommendation:</span>
+                        <span class="data-value">${this.getRecommendation(session.finalScore)}</span>
+                    </div>
+                </div>
+
+                <div class="footer">
+                    <p><strong>DISCLAIMER:</strong> This certificate is generated for demonstration purposes only.</p>
+                    <p>Click2Care Medical Terminal v3.0 - Retro Patient Monitor System</p>
+                    <p>This is not a real medical document and should not be used for actual medical diagnosis.</p>
+                </div>
+            </div>
+        </body>
+        </html>`;
+
+        // Open the certificate in a new window and trigger print
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+            printWindow.document.write(certificateHTML);
+            printWindow.document.close();
+            
+            // Wait for content to load then print
+            printWindow.onload = () => {
+                printWindow.print();
+                this.playFeedback('success');
+                this.showAlert('SUCCESS', 'Death certificate generated and ready for printing');
+            };
+        } else {
+            this.showAlert('ERROR', 'Popup blocked. Please allow popups and try again.');
+            this.playFeedback('error');
+        }
+    }
+
+    /**
+     * Get heart status description based on score
+     */
+    getHeartStatus(score) {
+        if (score >= 50) return 'EXCELLENT';
+        if (score >= 40) return 'GOOD';
+        if (score >= 30) return 'FAIR';
+        if (score >= 20) return 'POOR';
+        return 'CRITICAL';
+    }
+
+    /**
+     * Get breath status description based on score
+     */
+    getBreathStatus(score) {
+        if (score >= 30) return 'EXCELLENT';
+        if (score >= 25) return 'GOOD';
+        if (score >= 20) return 'FAIR';
+        if (score >= 15) return 'POOR';
+        return 'CRITICAL';
     }
 
     updateAIMessage() {

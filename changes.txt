@@ -77,3 +77,74 @@ TESTING:
 - Patient records display enhanced information
 - Session results show detailed breakdown with visual indicators
 
+=== LATEST CHANGES - DEATH CERTIFICATE FUNCTIONALITY ===
+
+1. RENAMED UPLOAD PHOTO BUTTON:
+   - Changed button text from "UPLOAD PHOTO" to "PRINT DEATH CERT"
+   - Updated button title from "UPLOAD PHOTO" to "PRINT DEATH CERTIFICATE"
+   - File: teamayyo/click2care/index.html (lines 283-289)
+
+2. ENHANCED PHOTO UPLOAD FUNCTIONALITY:
+   - Modified handlePhotoUpload() to automatically generate death certificate after photo upload
+   - Added 1-second delay before certificate generation for better UX
+   - Updated diagnosis message to "PHOTO UPLOADED - GENERATING CERTIFICATE_"
+   - File: teamayyo/click2care/script.js (lines 1899-1918)
+
+3. COMPREHENSIVE DEATH CERTIFICATE GENERATION:
+   - Replaced simple printCertificate() with advanced generateDeathCertificate()
+   - Creates professional-looking PDF-style certificate with:
+     * Patient photograph
+     * Days left to live (prominently displayed)
+     * Heart condition details (score, BPM, status)
+     * Breath condition details (score, quality, status)
+     * Overall assessment (final score, mood, recommendation)
+     * Professional styling with borders, sections, and typography
+   - Includes Click2Care branding and disclaimer
+   - Automatically triggers print dialog
+   - File: teamayyo/click2care/script.js (lines 1920-2187)
+
+4. NEW UTILITY FUNCTIONS:
+   - getHeartStatus(score): Returns status description based on heart score
+   - getBreathStatus(score): Returns status description based on breath score
+   - Both functions provide EXCELLENT/GOOD/FAIR/POOR/CRITICAL ratings
+   - File: teamayyo/click2care/script.js (lines 2188-2206)
+
+5. ENHANCED SESSION COMPLETION:
+   - Added automatic display of print death certificate button after session completion
+   - Button appears in finishEnhancedSessionScoring() function
+   - Ensures users can easily access certificate generation after completing tests
+   - File: teamayyo/click2care/script.js (lines 1456-1458)
+
+6. IMPROVED USER EXPERIENCE:
+   - Certificate generation includes comprehensive patient data
+   - Professional document layout with proper sections and formatting
+   - Automatic print dialog for easy PDF generation
+   - Error handling for missing photos and popup blockers
+   - Success/error feedback with audio and alerts
+
+7. CERTIFICATE FEATURES:
+   - A4 page format with proper margins
+   - Professional typography using Courier New font
+   - Structured data presentation with clear sections
+   - Patient photo prominently displayed
+   - Days left to live highlighted in red
+   - Click2Care branding and version stamp
+   - Comprehensive medical disclaimer
+   - Print-ready formatting
+
+The death certificate functionality now provides a complete end-to-end experience:
+1. User completes heart and breath tests
+2. Session results are calculated and stored
+3. User clicks "PRINT DEATH CERT" button
+4. User uploads a photo
+5. System automatically generates comprehensive certificate
+6. Certificate opens in new window with print dialog
+7. User can print or save as PDF
+
+This creates a professional medical document parody that includes all requested elements:
+- Days left to live
+- Heart condition details
+- Breath condition details
+- Uploaded patient photo
+- Professional formatting suitable for printing
+
