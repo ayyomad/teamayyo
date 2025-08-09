@@ -28,6 +28,7 @@ class RetroPatientMonitor {
         this.mediaStream = null;
         this.audioAnalyser = null;
         this.micSensitivity = 0.35; // Reduced sensitivity
+        this.breathHistory = [];
         
         // Canvas Elements
         this.ecgCanvas = null;
@@ -227,10 +228,41 @@ class RetroPatientMonitor {
             this.ecgCanvas.addEventListener('click', () => this.simulateHeartbeat());
         }
 
+        // Combined Heart + Mood Card (Section 2) click handler
+        const combinedCard = document.getElementById('heartCombinedCard');
+        if (combinedCard) {
+            combinedCard.addEventListener('click', (e) => {
+                if (e.target && e.target.closest && e.target.closest('button')) return;
+                this.simulateHeartbeat();
+            });
+        }
+
         // Microphone Toggle
         const micToggle = document.getElementById('micToggle');
         if (micToggle) {
             micToggle.addEventListener('click', () => this.toggleMicrophone());
+        }
+
+        // Breath extra controls
+        const breathStart = document.querySelector('.breath-start');
+        const breathStop = document.querySelector('.breath-stop');
+        if (breathStart) {
+            breathStart.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!this.isPoweredOn) return;
+                if (!this.microphoneEnabled) {
+                    this.toggleMicrophone();
+                }
+            });
+        }
+        if (breathStop) {
+            breathStop.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!this.isPoweredOn) return;
+                if (this.microphoneEnabled) {
+                    this.toggleMicrophone();
+                }
+            });
         }
 
         // Vital Cards
@@ -636,6 +668,8 @@ class RetroPatientMonitor {
     updateBreathDisplay() {
         const breathQuality = document.getElementById('breathQuality');
         const breathStatus = document.getElementById('breathStatus');
+        const breathRecognition = document.getElementById('breathRecognition');
+        const breathCanvas = document.getElementById('breathCanvas');
         
         const displayValue = this.breathQuality > 0 ? this.breathQuality : '--';
         
@@ -654,6 +688,48 @@ class RetroPatientMonitor {
             } else {
                 breathStatus.textContent = 'WEAK';
             }
+        }
+        
+        // Simple recognition text
+        if (breathRecognition) {
+            if (this.microphoneEnabled && this.breathQuality > 0) {
+                breathRecognition.textContent = 'RECOGNITION: BREATH';
+            } else if (this.microphoneEnabled) {
+                breathRecognition.textContent = 'RECOGNITION: SILENCE';
+            } else {
+                breathRecognition.textContent = 'RECOGNITION: --';
+            }
+        }
+
+        // Update breath mini graph
+        if (breathCanvas) {
+            const ctx = breathCanvas.getContext('2d');
+            const width = breathCanvas.width = breathCanvas.offsetWidth || breathCanvas.width;
+            const height = breathCanvas.height = breathCanvas.offsetHeight || breathCanvas.height;
+
+            // push history and clamp
+            this.breathHistory.push(Math.max(0, Math.min(100, this.breathQuality)));
+            if (this.breathHistory.length > width) {
+                this.breathHistory.shift();
+            }
+
+            ctx.fillStyle = '#000800';
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.strokeStyle = '#0080ff';
+            ctx.lineWidth = 2;
+            ctx.shadowColor = '#0080ff';
+            ctx.shadowBlur = 4;
+            ctx.beginPath();
+
+            const len = this.breathHistory.length;
+            for (let i = 0; i < len; i++) {
+                const x = i;
+                const y = height - (this.breathHistory[i] / 100) * height;
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            ctx.shadowBlur = 0;
         }
         
         // Update breath bars

@@ -173,8 +173,8 @@
                   </div>
                 </section>
 
-                <!-- Graph Section -->
-                <section class="graph-section">
+                <!-- Combined Heart & Mood Section (Section 2) -->
+                <section class="graph-section combined-section">
                   <div class="panel-header">
                     <h2 class="panel-title">ECG MONITOR</h2>
                     <div class="graph-controls">
@@ -187,63 +187,91 @@
                     </div>
                   </div>
                   <div class="panel-body">
-                    <div class="graph-container">
-                      <div class="crt-screen">
-                        <canvas
-                          id="ecgCanvas"
-                          width="600"
-                          height="200"
-                        ></canvas>
-                        <div class="screen-grid"></div>
-                        <div class="graph-overlay">
-                          <div class="bpm-display">
-                            <span class="bpm-label">BPM:</span>
-                            <span class="bpm-value" id="bpmValue">--</span>
+                    <div class="combined-layout" id="heartCombinedCard">
+                      <div class="combined-left">
+                        <div class="graph-container">
+                          <div class="crt-screen">
+                            <canvas
+                              id="ecgCanvas"
+                              width="600"
+                              height="200"
+                            ></canvas>
+                            <div class="screen-grid"></div>
+                            <div class="graph-overlay">
+                              <div class="bpm-display">
+                                <span class="bpm-label">BPM:</span>
+                                <span class="bpm-value" id="bpmValue">--</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="graph-message">
+                            <span id="graphMessage">CLICK ANYWHERE IN THIS CARD TO GENERATE HEARTBEAT</span>
                           </div>
                         </div>
                       </div>
-                      <div class="graph-message">
-                        <span id="graphMessage"
-                          >CLICK TO GENERATE HEARTBEAT</span
-                        >
+                      <div class="combined-right">
+                        <!-- Heart Rate Card (unchanged design) -->
+                        <div class="vital-card bpm-card">
+                          <div class="card-header">
+                            <h3 class="card-title">HEART RATE</h3>
+                            <div class="card-icon">
+                              <div class="pixel-heart-small">
+                                <div class="heart-beat-pixel"></div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="card-body">
+                            <div class="vital-display">
+                              <div class="vital-value">
+                                <span class="value" id="heartRate">--</span>
+                                <span class="unit">BPM</span>
+                              </div>
+                              <div class="vital-bars">
+                                <div class="bar" data-level="1"></div>
+                                <div class="bar" data-level="2"></div>
+                                <div class="bar" data-level="3"></div>
+                                <div class="bar" data-level="4"></div>
+                                <div class="bar" data-level="5"></div>
+                              </div>
+                            </div>
+                            <div class="vital-status" id="heartStatus">WAITING...</div>
+                          </div>
+                        </div>
+
+                        <!-- Patient Mood Card -->
+                        <div class="vital-card mood-card">
+                          <div class="card-header">
+                            <h3 class="card-title">PATIENT MOOD</h3>
+                            <div class="card-icon">
+                              <div class="pixel-face" id="moodIcon">
+                                <div class="face-pixel eye"></div>
+                                <div class="face-pixel eye"></div>
+                                <div class="face-pixel mouth"></div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="card-body">
+                            <div class="vital-display">
+                              <div class="vital-value">
+                                <span class="value mood-text" id="moodValue">NEUTRAL</span>
+                              </div>
+                              <div class="mood-indicator">
+                                <div class="mood-bar good"></div>
+                                <div class="mood-bar ok"></div>
+                                <div class="mood-bar bad"></div>
+                              </div>
+                            </div>
+                            <div class="vital-status" id="moodStatus">BASED ON VITALS</div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </section>
 
-                <!-- Vitals Section -->
+                <!-- Vitals Section (Section 3 - Breath only) -->
                 <section class="vitals-section">
-                  <!-- Heart Rate Card -->
-                  <div class="vital-card bpm-card">
-                    <div class="card-header">
-                      <h3 class="card-title">HEART RATE</h3>
-                      <div class="card-icon">
-                        <div class="pixel-heart-small">
-                          <div class="heart-beat-pixel"></div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="card-body">
-                      <div class="vital-display">
-                        <div class="vital-value">
-                          <span class="value" id="heartRate">--</span>
-                          <span class="unit">BPM</span>
-                        </div>
-                        <div class="vital-bars">
-                          <div class="bar" data-level="1"></div>
-                          <div class="bar" data-level="2"></div>
-                          <div class="bar" data-level="3"></div>
-                          <div class="bar" data-level="4"></div>
-                          <div class="bar" data-level="5"></div>
-                        </div>
-                      </div>
-                      <div class="vital-status" id="heartStatus">
-                        WAITING...
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Breath Quality Card -->
+                  <!-- Breath Quality Card (expanded) -->
                   <div class="vital-card breath-card">
                     <div class="card-header">
                       <h3 class="card-title">BREATH QUALITY</h3>
@@ -276,37 +304,14 @@
                           <span class="btn-text">MIC OFF</span>
                           <div class="btn-led"></div>
                         </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Patient Mood Card -->
-                  <div class="vital-card mood-card">
-                    <div class="card-header">
-                      <h3 class="card-title">PATIENT MOOD</h3>
-                      <div class="card-icon">
-                        <div class="pixel-face" id="moodIcon">
-                          <div class="face-pixel eye"></div>
-                          <div class="face-pixel eye"></div>
-                          <div class="face-pixel mouth"></div>
+                        <div class="breath-extra-controls">
+                          <button class="pixel-btn breath-start"><span class="btn-text">START LISTEN</span></button>
+                          <button class="pixel-btn breath-stop"><span class="btn-text">STOP LISTEN</span></button>
                         </div>
-                      </div>
-                    </div>
-                    <div class="card-body">
-                      <div class="vital-display">
-                        <div class="vital-value">
-                          <span class="value mood-text" id="moodValue"
-                            >NEUTRAL</span
-                          >
+                        <div class="breath-recognition" id="breathRecognition">RECOGNITION: --</div>
+                        <div class="breath-graph">
+                          <canvas id="breathCanvas" width="300" height="100"></canvas>
                         </div>
-                        <div class="mood-indicator">
-                          <div class="mood-bar good"></div>
-                          <div class="mood-bar ok"></div>
-                          <div class="mood-bar bad"></div>
-                        </div>
-                      </div>
-                      <div class="vital-status" id="moodStatus">
-                        BASED ON VITALS
                       </div>
                     </div>
                   </div>
