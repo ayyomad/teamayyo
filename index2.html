@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RETRO MEDICAL TERMINAL v2.1</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono:wght@400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style2.css" />
+  </head>
+  <body>
+    <div class="crt-container">
+      <div class="crt-screen">
+        <!-- CRT Scanlines Effect -->
+        <div class="scanlines"></div>
+        <div class="crt-flicker"></div>
+
+        <!-- Terminal Header -->
+        <header class="terminal-header">
+          <div class="terminal-title">
+            <span class="terminal-prompt">MEDICAL_TERMINAL></span>
+            <span class="blinking-cursor">_</span>
+          </div>
+          <div class="system-controls">
+            <button class="pixel-btn power-btn" data-sound="beep">
+              <span class="pixel-text">PWR</span>
+            </button>
+            <div class="system-status">
+              <div class="status-led"></div>
+              <span class="status-text">OFFLINE</span>
+            </div>
+          </div>
+        </header>
+
+        <!-- Main Terminal Grid -->
+        <main class="terminal-grid">
+          <!-- ECG Monitor Card -->
+          <div class="pixel-card ecg-card">
+            <div class="card-header">
+              <div class="card-title">ECG MONITOR</div>
+              <div class="card-status">
+                <span class="status-indicator">●</span>
+                <span class="status-label">STANDBY</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="ecg-display">
+                <div class="pixel-screen ecg-screen">
+                  <canvas id="ecgCanvas" width="280" height="120"></canvas>
+                  <div class="screen-grid"></div>
+                  <div class="screen-overlay">
+                    <div class="bpm-reading">
+                      <span class="bpm-label">BPM:</span>
+                      <span class="bpm-value">--</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <button class="pixel-btn heartbeat-btn" data-sound="click">
+                <span class="pixel-text">PULSE</span>
+              </button>
+              <div class="measurement-timer">15s</div>
+            </div>
+          </div>
+
+          <!-- Breath Monitor Card -->
+          <div class="pixel-card breath-card">
+            <div class="card-header">
+              <div class="card-title">BREATH ANALYSIS</div>
+              <div class="card-status">
+                <span class="status-indicator">●</span>
+                <span class="status-label">DISABLED</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="breath-display">
+                <div class="pixel-screen breath-screen">
+                  <canvas id="breathCanvas" width="280" height="80"></canvas>
+                  <div class="screen-grid"></div>
+                  <div class="breath-meter">
+                    <div class="meter-bars">
+                      <div class="meter-bar" data-level="1"></div>
+                      <div class="meter-bar" data-level="2"></div>
+                      <div class="meter-bar" data-level="3"></div>
+                      <div class="meter-bar" data-level="4"></div>
+                      <div class="meter-bar" data-level="5"></div>
+                      <div class="meter-bar" data-level="6"></div>
+                      <div class="meter-bar" data-level="7"></div>
+                      <div class="meter-bar" data-level="8"></div>
+                    </div>
+                    <div class="breath-quality">
+                      QUALITY: <span id="breathValue">--</span>%
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <button class="pixel-btn mic-toggle-btn" data-sound="toggle">
+                <span class="pixel-text">MIC OFF</span>
+              </button>
+              <div class="breath-status">INACTIVE</div>
+            </div>
+          </div>
+
+          <!-- AI Analysis Card -->
+          <div class="pixel-card ai-card">
+            <div class="card-header">
+              <div class="card-title">AI DIAGNOSIS</div>
+              <div class="card-status">
+                <span class="status-indicator">●</span>
+                <span class="status-label">ANALYZING</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="ai-display">
+                <div class="pixel-screen ai-screen">
+                  <div class="terminal-output">
+                    <div class="output-line">
+                      <span class="prompt">></span>
+                      <span class="text">SYSTEM READY</span>
+                    </div>
+                    <div class="output-line">
+                      <span class="prompt">></span>
+                      <span class="text">AWAITING INPUT...</span>
+                    </div>
+                    <div class="output-line">
+                      <span class="prompt">></span>
+                      <span class="text">ACTIVATE MONITORING</span>
+                    </div>
+                    <div class="output-line">
+                      <span class="prompt">></span>
+                      <span class="text">TO BEGIN ANALYSIS</span>
+                    </div>
+                    <div class="output-line current-line">
+                      <span class="prompt">></span>
+                      <span class="text" id="aiOutput">STANDBY_</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <div class="ai-confidence">
+                <span class="confidence-label">CONFIDENCE:</span>
+                <div class="confidence-bars">
+                  <div class="conf-bar"></div>
+                  <div class="conf-bar"></div>
+                  <div class="conf-bar"></div>
+                  <div class="conf-bar"></div>
+                  <div class="conf-bar"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Control Panel Card -->
+          <div class="pixel-card control-card">
+            <div class="card-header">
+              <div class="card-title">SYSTEM CONTROL</div>
+              <div class="card-status">
+                <span class="status-indicator">●</span>
+                <span class="status-label">READY</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="control-display">
+                <div class="control-grid">
+                  <button
+                    class="pixel-btn control-btn start-btn"
+                    data-sound="start"
+                  >
+                    <span class="pixel-text">START</span>
+                  </button>
+                  <button
+                    class="pixel-btn control-btn stop-btn"
+                    data-sound="stop"
+                  >
+                    <span class="pixel-text">STOP</span>
+                  </button>
+                  <button
+                    class="pixel-btn control-btn reset-btn"
+                    data-sound="reset"
+                  >
+                    <span class="pixel-text">RESET</span>
+                  </button>
+                  <button
+                    class="pixel-btn control-btn save-btn"
+                    data-sound="save"
+                  >
+                    <span class="pixel-text">SAVE</span>
+                  </button>
+                </div>
+                <div class="system-info">
+                  <div class="info-line">
+                    <span class="info-label">UPTIME:</span>
+                    <span class="info-value" id="uptime">00:00:00</span>
+                  </div>
+                  <div class="info-line">
+                    <span class="info-label">STATUS:</span>
+                    <span class="info-value" id="systemStatus">OFFLINE</span>
+                  </div>
+                  <div class="info-line">
+                    <span class="info-label">MODE:</span>
+                    <span class="info-value" id="systemMode">STANDBY</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <div class="emergency-controls">
+                <button class="pixel-btn emergency-btn" data-sound="emergency">
+                  <span class="pixel-text">EMERGENCY</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <!-- Terminal Footer -->
+        <footer class="terminal-footer">
+          <div class="footer-info">
+            <span class="system-version">MEDTERM v2.1.0</span>
+            <span class="separator">|</span>
+            <span class="system-time" id="systemTime">00:00:00</span>
+            <span class="separator">|</span>
+            <span class="connection-status">LOCALHOST</span>
+          </div>
+          <div class="footer-commands">
+            <span class="command">F1:HELP</span>
+            <span class="command">F2:SAVE</span>
+            <span class="command">F3:LOAD</span>
+            <span class="command">ESC:EXIT</span>
+          </div>
+        </footer>
+      </div>
+    </div>
+
+    <!-- Alert Modal -->
+    <div class="pixel-modal hidden" id="alertModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="modal-title">SYSTEM ALERT</span>
+          <button class="pixel-btn close-btn" onclick="closeAlert()">X</button>
+        </div>
+        <div class="modal-body">
+          <div class="alert-icon">⚠</div>
+          <div class="alert-text" id="alertText">CRITICAL ERROR DETECTED</div>
+        </div>
+        <div class="modal-footer">
+          <button
+            class="pixel-btn acknowledge-btn"
+            onclick="acknowledgeAlert()"
+          >
+            <span class="pixel-text">ACKNOWLEDGE</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="script2.js"></script>
+  </body>
+</html>

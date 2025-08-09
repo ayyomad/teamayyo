@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manual Patient Monitor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="dashboard">
+      <!-- Left Sidebar -->
+      <aside class="sidebar">
+        <div class="logo">
+          <div class="logo-icon">
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+            </svg>
+          </div>
+        </div>
+
+        <nav class="nav-menu">
+          <button class="nav-item active" data-tooltip="Dashboard">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="3" y="3" width="7" height="7" />
+              <rect x="14" y="3" width="7" height="7" />
+              <rect x="14" y="14" width="7" height="7" />
+              <rect x="3" y="14" width="7" height="7" />
+            </svg>
+          </button>
+
+          <button class="nav-item" data-tooltip="Heart Monitor">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+            </svg>
+          </button>
+
+          <button class="nav-item" data-tooltip="Breath Analysis">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12,6 12,12 16,14" />
+            </svg>
+          </button>
+
+          <button class="nav-item" data-tooltip="Patient Records">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+              />
+              <polyline points="14,2 14,8 20,8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <polyline points="10,9 9,9 8,9" />
+            </svg>
+          </button>
+
+          <button class="nav-item" data-tooltip="Settings">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="3" />
+              <path
+                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+              />
+            </svg>
+          </button>
+
+          <button class="nav-item" data-tooltip="Power">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
+              <line x1="12" y1="2" x2="12" y2="12" />
+            </svg>
+          </button>
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="header">
+          <h1>Manual Patient Monitor</h1>
+          <div class="header-info">
+            <span class="date">March 2024</span>
+            <div class="header-controls">
+              <button class="theme-toggle" title="Toggle Theme">
+                <svg
+                  class="theme-icon sun-icon"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <circle cx="12" cy="12" r="5" />
+                  <path
+                    d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
+                  />
+                </svg>
+                <svg
+                  class="theme-icon moon-icon"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+              </button>
+              <button class="power-btn" title="Power On/Off">
+                <svg
+                  class="power-icon"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
+                  <line x1="12" y1="2" x2="12" y2="12" />
+                </svg>
+              </button>
+              <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>System Ready</span>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <div class="content-grid">
+          <!-- Analysis Box -->
+          <section class="analysis-box">
+            <h2>AI Diagnosis</h2>
+            <div class="diagnosis-content">
+              <div class="diagnosis-status">
+                <div class="status-icon">⚕️</div>
+                <p>Diagnosis: System Ready</p>
+              </div>
+              <div class="analysis-details">
+                <p>Power ON to begin monitoring</p>
+                <p>Click graph or use microphone for input</p>
+              </div>
+              <div class="alert-section hidden">
+                <div class="alert-indicator">
+                  <div class="alert-icon">⚠️</div>
+                  <p class="alert-message">PATIENT CRITICAL</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Graph Section -->
+          <section class="graph-section">
+            <div class="graph-header">
+              <h2>ECG Monitor</h2>
+              <div class="graph-controls">
+                <button class="control-btn">Start</button>
+                <button class="control-btn">Reset</button>
+              </div>
+            </div>
+            <div class="graph-container">
+              <div class="graph-placeholder">
+                <div class="ecg-line"></div>
+                <div class="graph-grid"></div>
+                <p class="graph-message">Click to generate heartbeat</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Vitals Cards -->
+          <section class="vitals-section">
+            <div class="vital-card bpm-card">
+              <div class="card-header">
+                <h3>Heart Rate</h3>
+                <div class="card-icon">💓</div>
+              </div>
+              <div class="vital-value">
+                <span class="value">--</span>
+                <span class="unit">BPM</span>
+              </div>
+              <div class="vital-status">Waiting...</div>
+            </div>
+
+            <div class="vital-card breath-card">
+              <div class="card-header">
+                <h3>Breath Quality</h3>
+                <div class="card-icon">🫁</div>
+              </div>
+              <div class="vital-value">
+                <span class="value">--</span>
+                <span class="unit">%</span>
+              </div>
+              <div class="vital-status">No input detected</div>
+            </div>
+
+            <div class="vital-card mood-card">
+              <div class="card-header">
+                <h3>Patient Mood</h3>
+                <div class="card-icon">😐</div>
+              </div>
+              <div class="vital-value">
+                <span class="value">Neutral</span>
+              </div>
+              <div class="vital-status">Based on vitals</div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
