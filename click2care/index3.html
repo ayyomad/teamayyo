@@ -266,6 +266,17 @@
                         </div>
                       </div>
                     </div>
+                    <div class="diagnosis-actions">
+                      <input type="file" id="photoUpload" accept="image/*" class="hidden" />
+                      <div class="actions-row">
+                        <button class="pixel-btn" id="uploadPhotoBtn" title="UPLOAD PHOTO">
+                          <span class="btn-text">UPLOAD PHOTO</span>
+                        </button>
+                        <button class="pixel-btn" id="printDeathCert" title="PRINT CERTIFICATE" style="display:none;">
+                          <span class="btn-text">PRINT CERT</span>
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </section>
 
@@ -362,6 +373,28 @@
             onclick="acknowledgeAlert()"
           >
             <span class="btn-text">ACKNOWLEDGE</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Session Toast -->
+    <div class="pixel-modal hidden" id="toastModal">
+      <div class="modal-content" style="border-color:#00ff41; max-width: 420px;">
+        <div class="modal-header" style="border-bottom-color:#00ff41;">
+          <span class="modal-title" id="toastTitle">SESSION</span>
+          <button class="pixel-btn close-btn" onclick="closeToast()">
+            <span class="btn-text">X</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="alert-display">
+            <div class="alert-text" id="toastText">SESSION MESSAGE</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="pixel-btn acknowledge-btn" onclick="closeToast()">
+            <span class="btn-text">OK</span>
           </button>
         </div>
       </div>

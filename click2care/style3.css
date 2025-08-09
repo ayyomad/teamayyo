@@ -603,6 +603,9 @@ body {
     height: calc(100% - 60px);
 }
 
+.diagnosis-actions { margin-top: 12px; }
+.actions-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
 /* Analysis Box */
 .analysis-box {
     grid-column: 1;
@@ -699,8 +702,9 @@ body {
 
 /* Combined (Section 2) layout */
 .combined-section .panel-body { display: flex; flex-direction: column; }
-.combined-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; align-items: stretch; }
-.combined-left, .combined-right { display: flex; flex-direction: column; gap: 16px; }
+.combined-layout { display: grid; grid-template-columns: 1fr; grid-auto-rows: auto; gap: 16px; align-items: stretch; }
+.combined-left { display: flex; flex-direction: column; gap: 16px; }
+.combined-right { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: stretch; }
 .combined-left .graph-container { flex: 1; }
 
 .graph-controls {

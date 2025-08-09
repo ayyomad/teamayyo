@@ -1,4 +1,4 @@
-// RETRO PATIENT MONITOR v3.0 - PIXEL DASHBOARD EDITION
+
 // Enhanced Medical Device Simulator with Original Dashboard Layout + Retro Aesthetics
 
 class RetroPatientMonitor {
@@ -22,6 +22,9 @@ class RetroPatientMonitor {
         this.bpmDecayInterval = null;
         this.inactivityTimer = null;
         this.lastInputTime = 0;
+        this.lastHeartbeatTime = 0;
+        this.lastBreathTime = 0;
+        this.globalDecayInterval = null;
         
         // Microphone System
         this.microphoneEnabled = false;
@@ -45,6 +48,14 @@ class RetroPatientMonitor {
         this.monitoringBeepInterval = null;
         this.ecgAnimationInterval = null;
         this.aiUpdateInterval = null;
+        this.sessionActive = false;
+        this.sessionTimers = { heart: null, breath: null, analyze: null };
+        this.sessionPhotoDataUrl = null;
+        this.currentSession = null;
+        this.heartSamples = [];
+        this.breathSamples = [];
+        this.heartSampleInterval = null;
+        this.breathSampleInterval = null;
         
         // AI Messages
         this.aiMessages = [
@@ -225,7 +236,23 @@ class RetroPatientMonitor {
 
         // ECG Canvas for heartbeat simulation
         if (this.ecgCanvas) {
-            this.ecgCanvas.addEventListener('click', () => this.simulateHeartbeat());
+            this.ecgCanvas.addEventListener('click', (e) => {
+                // Prevent bubbling to combined card to avoid double heartbeats
+                e.stopPropagation();
+                this.simulateHeartbeat();
+            });
+        }
+
+        // Diagnosis actions
+        const uploadPhotoBtn = document.getElementById('uploadPhotoBtn');
+        const photoUpload = document.getElementById('photoUpload');
+        const printDeathCert = document.getElementById('printDeathCert');
+        if (uploadPhotoBtn && photoUpload) {
+            uploadPhotoBtn.addEventListener('click', () => photoUpload.click());
+            photoUpload.addEventListener('change', (e) => this.handlePhotoUpload(e));
+        }
+        if (printDeathCert) {
+            printDeathCert.addEventListener('click', () => this.printCertificate());
         }
 
         // Combined Heart + Mood Card (Section 2) click handler
@@ -233,6 +260,8 @@ class RetroPatientMonitor {
         if (combinedCard) {
             combinedCard.addEventListener('click', (e) => {
                 if (e.target && e.target.closest && e.target.closest('button')) return;
+                // Ignore clicks originating from ECG area; canvas already handles it
+                if (e.target.closest && (e.target.closest('.crt-screen') || e.target.closest('#ecgCanvas'))) return;
                 this.simulateHeartbeat();
             });
         }
@@ -302,6 +331,8 @@ class RetroPatientMonitor {
             this.playSound('power_on');
             this.updateDiagnosis('SYSTEM BOOT COMPLETE_');
             this.startMonitoringBeeps();
+            // Start guided session
+            this.startGuidedSession();
             
             console.log('POWER: ON');
         } else {
@@ -315,6 +346,7 @@ class RetroPatientMonitor {
             this.resetDisplays();
             this.playSound('power_off');
             this.updateDiagnosis('SYSTEM SHUTDOWN_');
+            this.endSessionTimers();
             
             console.log('POWER: OFF');
         }
@@ -375,6 +407,7 @@ class RetroPatientMonitor {
         
         const now = Date.now();
         this.lastInputTime = now;
+        this.lastHeartbeatTime = now;
         this.isPatientAlive = true;
         
         // Record heartbeat
@@ -492,11 +525,16 @@ class RetroPatientMonitor {
     startMonitoring() {
         this.measurementStartTime = Date.now();
         this.lastInputTime = Date.now();
+        this.lastHeartbeatTime = Date.now();
         
         // Start BPM decay monitoring
         this.bpmDecayInterval = setInterval(() => {
             this.updateBPMDecay();
         }, 1000);
+
+        // Start global inactivity/decay loop
+        if (this.globalDecayInterval) clearInterval(this.globalDecayInterval);
+        this.globalDecayInterval = setInterval(() => this.updateGlobalInactivity(), 1000);
         
         // Start inactivity monitoring
         this.checkInactivity();
@@ -539,6 +577,24 @@ class RetroPatientMonitor {
             // If BPM reaches 0, patient is critical
             if (this.currentBPM === 0 && this.isPatientAlive) {
                 this.triggerPatientCritical();
+            }
+        }
+    }
+
+    updateGlobalInactivity() {
+        if (!this.isMonitoring || !this.isPoweredOn) return;
+        const now = Date.now();
+        const sinceHeartbeat = now - this.lastHeartbeatTime;
+        // After 5s with no heartbeat, gradually fall BPM
+        if (sinceHeartbeat > 5000 && this.currentBPM > 0) {
+            this.currentBPM = Math.max(0, this.currentBPM - 3);
+            this.updateBPMDisplay();
+        }
+        // Breath inactivity alert if mic is on and breath weak for 5s
+        if (this.microphoneEnabled) {
+            if (this.breathQuality <= 20 && (now - this.lastInputTime) > 5000 && this.isPatientAlive) {
+                this.showAlert('BREATH ALERT', 'WEAK OR NO BREATH DETECTED');
+                this.playSound('alarm');
             }
         }
     }
@@ -649,6 +705,7 @@ class RetroPatientMonitor {
             if (normalizedLevel > this.micSensitivity) {
                 this.breathQuality = Math.min(100, Math.floor(normalizedLevel * 100));
                 this.lastInputTime = Date.now(); // Reset inactivity timer
+                this.lastBreathTime = this.lastInputTime;
                 this.isPatientAlive = true;
                 this.hideAlert();
                 this.updateBreathDisplay();
@@ -901,6 +958,204 @@ class RetroPatientMonitor {
                 this.updateAIMessage();
             }
         }, 4000);
+    }
+
+    // Session Guidance + Storage
+    startGuidedSession() {
+        // New session object
+        this.currentSession = {
+            id: Date.now().toString(),
+            heartScore: 0,
+            breathScore: 0,
+            finalScore: 0,
+            resultMessage: ''
+        };
+        this.sessionActive = true;
+        this.heartSamples = [];
+        this.breathSamples = [];
+        this.showToast('TEST SESSION', 'Start Heart Test – Place your finger on the sensor');
+        this.updateDiagnosis('SESSION: HEART TEST STARTED_');
+        // Heart test 15s
+        this.beginHeartSampling(15000);
+    }
+
+    beginHeartSampling(durationMs) {
+        // Collect BPM samples every second
+        if (this.heartSampleInterval) clearInterval(this.heartSampleInterval);
+        this.heartSampleInterval = setInterval(() => {
+            if (this.currentBPM > 0) this.heartSamples.push(this.currentBPM);
+        }, 1000);
+        this.sessionTimers.heart = setTimeout(() => {
+            clearInterval(this.heartSampleInterval);
+            this.heartSampleInterval = null;
+            this.currentSession.heartScore = this.computeHeartScore();
+            this.updateDiagnosis('HEART TEST COMPLETE_');
+            this.showToast('NEXT STEP', 'Prepare for Breath Test');
+            // Start breath after small delay
+            this.beginBreathSampling(10000);
+        }, durationMs);
+    }
+
+    beginBreathSampling(durationMs) {
+        // Collect Breath samples every second
+        if (this.breathSampleInterval) clearInterval(this.breathSampleInterval);
+        this.breathSampleInterval = setInterval(() => {
+            if (this.breathQuality > 0) this.breathSamples.push(this.breathQuality);
+        }, 1000);
+        this.sessionTimers.breath = setTimeout(() => {
+            clearInterval(this.breathSampleInterval);
+            this.breathSampleInterval = null;
+            this.currentSession.breathScore = this.computeBreathScore();
+            this.updateDiagnosis('BREATH TEST COMPLETE_');
+            this.finishSessionScoring();
+        }, durationMs);
+    }
+
+    computeHeartScore() {
+        if (!this.heartSamples.length) return 0;
+        // Favor normal zone 60-100 by mapping to 0-60
+        const last = this.heartSamples[this.heartSamples.length - 1];
+        let score = 0;
+        if (last >= 60 && last <= 100) score = 60;
+        else if (last > 100) score = Math.max(20, 60 - (last - 100));
+        else if (last > 0 && last < 60) score = Math.max(10, last - 20);
+        return Math.max(0, Math.min(60, score));
+    }
+
+    computeBreathScore() {
+        if (!this.breathSamples.length) return 0;
+        // Average breath quality mapped to 0-40
+        const avg = Math.round(this.breathSamples.reduce((a,b)=>a+b,0) / this.breathSamples.length);
+        return Math.max(0, Math.min(40, Math.floor(avg * 0.4)));
+    }
+
+    finishSessionScoring() {
+        const heartScore = this.currentSession.heartScore;
+        const breathScore = this.currentSession.breathScore;
+        const finalScore = heartScore + breathScore;
+        this.currentSession.finalScore = finalScore;
+        let resultMessage = '';
+        if (finalScore < 30) resultMessage = 'Critical – Less than 50 days left';
+        else if (finalScore < 60) resultMessage = 'Moderate – Keep improving';
+        else resultMessage = 'Safe – Plenty of time left';
+        this.currentSession.resultMessage = resultMessage;
+        this.persistSession(this.currentSession);
+        this.renderSessionResult(this.currentSession);
+        this.sessionActive = false;
+    }
+
+    renderSessionResult(session) {
+        this.updateDiagnosis(
+            `RESULTS: HEART ${session.heartScore} | BREATH ${session.breathScore} | FINAL ${session.finalScore} | ${session.resultMessage.toUpperCase()}_`
+        );
+    }
+
+    persistSession(session) {
+        try {
+            const key = 'lifeTestSessions';
+            const existing = JSON.parse(localStorage.getItem(key) || '[]');
+            existing.push(session);
+            localStorage.setItem(key, JSON.stringify(existing));
+        } catch {}
+    }
+
+    endSessionTimers() {
+        Object.values(this.sessionTimers).forEach(t => t && clearTimeout(t));
+        this.sessionTimers = { heart: null, breath: null, analyze: null };
+        if (this.heartSampleInterval) clearInterval(this.heartSampleInterval);
+        if (this.breathSampleInterval) clearInterval(this.breathSampleInterval);
+        this.heartSampleInterval = null;
+        this.breathSampleInterval = null;
+        this.sessionActive = false;
+        this.currentSession = null;
+        this.heartSamples = [];
+        this.breathSamples = [];
+    }
+
+    showToast(title, message) {
+        const toast = document.getElementById('toastModal');
+        const tTitle = document.getElementById('toastTitle');
+        const tText = document.getElementById('toastText');
+        if (!toast || !tTitle || !tText) return;
+        tTitle.textContent = title;
+        tText.textContent = message;
+        toast.classList.remove('hidden');
+        setTimeout(() => { try { toast.classList.add('hidden'); } catch {} }, 2500);
+    }
+    // Session-based diagnosis flow (15s heart -> 15s breath -> analyze)
+    startSession() {
+        if (!this.isPoweredOn || this.sessionActive) return;
+        this.sessionActive = true;
+        this.updateDiagnosis('SESSION STARTED: HEART CHECK (15S)_');
+        this.sessionTimers.heart = setTimeout(() => {
+            this.updateDiagnosis('HEART CHECK COMPLETE. STARTING BREATH CHECK..._');
+            this.sessionTimers.breath = setTimeout(() => {
+                this.updateDiagnosis('BREATH CHECK COMPLETE. ANALYZING..._');
+                this.sessionTimers.analyze = setTimeout(() => {
+                    this.completeSessionAnalysis();
+                }, 3000);
+            }, 15000);
+        }, 15000);
+    }
+
+    completeSessionAnalysis() {
+        const badBreath = this.breathQuality < 40;
+        const irregularHeart = this.currentBPM > 100 || (this.currentBPM > 0 && this.currentBPM < 60);
+        let daysToLive = 0;
+        if (badBreath && irregularHeart) {
+            daysToLive = Math.max(1, 30 - Math.floor((this.currentBPM || 60) / 2));
+            this.updateDiagnosis(`ANALYSIS: CRITICAL. EST. ${daysToLive} DAYS TO LIVE_`);
+        } else if (badBreath || irregularHeart) {
+            daysToLive = 120 - Math.min(80, Math.abs((this.currentBPM || 60) - 75));
+            this.updateDiagnosis(`ANALYSIS: MONITOR CLOSELY. EST. ${daysToLive} DAYS TO LIVE_`);
+        } else {
+            this.updateDiagnosis('ANALYSIS: STABLE. CONTINUE REGULAR CHECKUPS_');
+        }
+        const printBtn = document.getElementById('printDeathCert');
+        if (printBtn) printBtn.style.display = 'inline-flex';
+        this.sessionActive = false;
+    }
+
+    handlePhotoUpload(event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            this.sessionPhotoDataUrl = e.target.result;
+            this.playSound('toggle_on');
+            this.updateDiagnosis('PHOTO UPLOADED_');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    printCertificate() {
+        const w = window.open('', 'CERT');
+        if (!w) return;
+        const now = new Date().toLocaleString();
+        const mood = this.patientMood;
+        const bpm = this.currentBPM || '--';
+        const breath = this.breathQuality || '--';
+        const imgTag = this.sessionPhotoDataUrl ? `<img src="${this.sessionPhotoDataUrl}" style="max-width:200px;display:block;margin:12px 0;"/>` : '';
+        w.document.write(`
+          <html><head><title>Death Certificate</title>
+          <style>
+            body{ font-family: Arial, sans-serif; padding: 24px; }
+            h1{ margin: 0 0 8px; }
+            .meta{ color:#444; margin-bottom: 16px; }
+            .box{ border:1px solid #222; padding:12px; margin-top:12px; }
+          </style>
+          </head><body>
+            <h1>Death Certificate (Parody)</h1>
+            <div class=\"meta\">Generated: ${now}</div>
+            ${imgTag}
+            <div class=\"box\">Heartbeat (BPM): ${bpm}</div>
+            <div class=\"box\">Breath Quality: ${breath}%</div>
+            <div class=\"box\">Mood: ${mood}</div>
+            <p>This certificate is generated for demonstration purposes only.</p>
+            <script>window.onload=()=>window.print();<\\/script>
+          </body></html>
+        `);
+        w.document.close();
     }
 
     updateAIMessage() {
@@ -1171,6 +1426,11 @@ function acknowledgeAlert() {
         window.retroMonitor.hideAlert();
         window.retroMonitor.playSound('toggle_on');
     }
+}
+
+function closeToast() {
+    const t = document.getElementById('toastModal');
+    if (t) t.classList.add('hidden');
 }
 
 // Initialize Monitor
