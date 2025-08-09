@@ -476,6 +476,11 @@ class RetroPatientMonitor {
             this.updateDiagnosis('SYSTEM SHUTDOWN_');
             this.endSessionTimers();
             
+            // Ensure microphone is stopped when power is turned off
+            if (this.microphoneEnabled) {
+                this.stopMicrophone();
+            }
+            
             console.log('POWER: OFF');
         }
     }
@@ -522,6 +527,7 @@ class RetroPatientMonitor {
                 break;
             case 'PATIENT RECORDS':
                 this.viewPatientRecords();
+                this.updateDiagnosis('PATIENT RECORDS VIEW_');
                 return;
             case 'SETTINGS':
                 this.updateDiagnosis('SYSTEM SETTINGS_');
@@ -702,6 +708,11 @@ class RetroPatientMonitor {
     stopMonitoring() {
         this.isMonitoring = false;
         this.cleanupMonitoringTimers();
+        
+        // Ensure microphone is stopped when monitoring stops
+        if (this.microphoneEnabled) {
+            this.stopMicrophone();
+        }
         
         this.updateDiagnosis('MONITORING STOPPED_');
         this.playFeedback('warning');
@@ -930,7 +941,10 @@ class RetroPatientMonitor {
         const dataArray = new Uint8Array(this.audioAnalyser.frequencyBinCount);
 
         const analyzeAudio = () => {
-            if (!this.microphoneEnabled || !this.isPoweredOn) return;
+            if (!this.microphoneEnabled || !this.isPoweredOn) {
+                // Stop the analysis loop if microphone is disabled or system is off
+                return;
+            }
 
             this.audioAnalyser.getByteFrequencyData(dataArray);
 
@@ -955,7 +969,10 @@ class RetroPatientMonitor {
                 this.updateBreathDisplay();
             }
 
-            requestAnimationFrame(analyzeAudio);
+            // Continue the loop only if microphone is still enabled
+            if (this.microphoneEnabled && this.isPoweredOn) {
+                requestAnimationFrame(analyzeAudio);
+            }
         };
 
         analyzeAudio();
@@ -1150,6 +1167,11 @@ class RetroPatientMonitor {
     resetSystem() {
         this.stopAllMonitoring();
         
+        // Ensure microphone is stopped during reset
+        if (this.microphoneEnabled) {
+            this.stopMicrophone();
+        }
+        
         // Reset vital data
         this.heartbeats = [];
         this.currentBPM = 0;
@@ -1258,6 +1280,7 @@ class RetroPatientMonitor {
         
         // Set completion timer
         this.sessionTimers.heart = setTimeout(() => {
+            // Stop heart sampling
             clearInterval(this.heartSampleInterval);
             this.heartSampleInterval = null;
             this.currentSession.heartScore = this.computeHeartScore();
@@ -1267,7 +1290,7 @@ class RetroPatientMonitor {
             this.showAlert('HEART TEST COMPLETE', `Heart test over. Score: ${this.currentSession.heartScore}`);
             this.playFeedback('success');
             
-            // Start breath test after short delay (no need to disable inputs)
+            // Start breath test after short delay
             setTimeout(() => {
                 this.startBreathTestPhase();
             }, 2000);
@@ -1289,8 +1312,15 @@ class RetroPatientMonitor {
         
         // Set completion timer
         this.sessionTimers.breath = setTimeout(() => {
+            // Stop breath sampling
             clearInterval(this.breathSampleInterval);
             this.breathSampleInterval = null;
+            
+            // Stop microphone if it's still active
+            if (this.microphoneEnabled) {
+                this.stopMicrophone();
+            }
+            
             this.currentSession.breathScore = this.computeBreathScore();
             
             // Show breath test completion alert
@@ -1377,21 +1407,38 @@ class RetroPatientMonitor {
         
         // Show final diagnosis alert with better formatting
         this.hideAlert();
-        const alertMessage = `Heart Score: ${this.currentSession.heartScore}/60
-Breath Score: ${this.currentSession.breathScore}/40
-Final Score: ${finalScore}/100
-
-${resultMessage}`;
+        const alertMessage = `╔══════════════════════════════════════════════════════════════════════════════╗
+║ HEART SCORE: ${this.currentSession.heartScore.toString().padStart(2, '0')}/60 ${this.getScoreBar(this.currentSession.heartScore, 60)} ║
+║ BREATH SCORE: ${this.currentSession.breathScore.toString().padStart(2, '0')}/40 ${this.getScoreBar(this.currentSession.breathScore, 40)} ║
+║ FINAL SCORE: ${finalScore.toString().padStart(2, '0')}/100 ${this.getScoreBar(finalScore, 100)} ║
+╠══════════════════════════════════════════════════════════════════════════════╣
+║ DIAGNOSIS: ${resultMessage.toUpperCase().substring(0, 45).padEnd(45)} ║
+║ DAYS LEFT: ${daysLeft} ${this.getDaysLeftBar(daysLeft)} ║
+╠══════════════════════════════════════════════════════════════════════════════╣
+║ RECOMMENDATION: ${this.getRecommendation(finalScore).substring(0, 40).padEnd(40)} ║
+╚══════════════════════════════════════════════════════════════════════════════╝`;
         this.showAlert('DIAGNOSIS COMPLETE', alertMessage);
         this.playFeedback('info');
         
         // Update diagnosis display
         this.renderEnhancedSessionResult(this.currentSession);
         
+        // Show brief summary in diagnosis area
+        const summaryText = `SESSION COMPLETE:
+FINAL SCORE: ${finalScore}/100
+DIAGNOSIS: ${resultMessage.toUpperCase()}
+DAYS LEFT: ${daysLeft}`;
+        this.updateDiagnosis(summaryText);
+        
         // Reset session state
         this.sessionActive = false;
         this.sessionPhase = 'idle';
         this.enableInputs();
+        
+        // Ensure microphone is stopped when session ends
+        if (this.microphoneEnabled) {
+            this.stopMicrophone();
+        }
         
         // Remove phase indicators
         const heartCard = document.querySelector('.heart-card');
@@ -1411,21 +1458,70 @@ ${resultMessage}`;
     }
     
     /**
-     * Render enhanced session results with detailed information
+     * Render enhanced session results with detailed information and better formatting
      * @param {Object} session - Session data object
      */
     renderEnhancedSessionResult(session) {
-        // Create a more readable and formatted result display
+        // Create a more readable and formatted result display with cards
         const diagnosisText = `SESSION RESULTS:
-HEART SCORE: ${session.heartScore}/60
-BREATH SCORE: ${session.breathScore}/40
-FINAL SCORE: ${session.finalScore}/100
-DIAGNOSIS: ${session.resultMessage.toUpperCase()}_`;
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ HEART SCORE: ${session.heartScore.toString().padStart(2, '0')}/60 ${this.getScoreBar(session.heartScore, 60)} ║
+║ BREATH SCORE: ${session.breathScore.toString().padStart(2, '0')}/40 ${this.getScoreBar(session.breathScore, 40)} ║
+║ FINAL SCORE: ${session.finalScore.toString().padStart(2, '0')}/100 ${this.getScoreBar(session.finalScore, 100)} ║
+╠══════════════════════════════════════════════════════════════════════════════╣
+║ DIAGNOSIS: ${session.resultMessage.toUpperCase().substring(0, 45).padEnd(45)} ║
+║ DAYS LEFT: ${session.daysLeft || 'N/A'} ${this.getDaysLeftBar(session.daysLeft)} ║
+╚══════════════════════════════════════════════════════════════════════════════╝_`;
         this.updateDiagnosis(diagnosisText);
     }
     
     /**
-     * View patient records from localStorage
+     * Generate a visual progress bar for scores
+     * @param {number} score - Current score
+     * @param {number} max - Maximum score
+     * @returns {string} Visual progress bar
+     */
+    getScoreBar(score, max) {
+        const percentage = Math.min(100, (score / max) * 100);
+        const filledBlocks = Math.floor(percentage / 10);
+        const emptyBlocks = 10 - filledBlocks;
+        return '█'.repeat(filledBlocks) + '░'.repeat(emptyBlocks);
+    }
+    
+    /**
+     * Generate a visual bar for days left
+     * @param {number} days - Days left
+     * @returns {string} Visual days bar
+     */
+    getDaysLeftBar(days) {
+        if (!days || days <= 0) return '░░░░░░░░░░';
+        if (days >= 1000) return '██████████';
+        if (days >= 365) return '████████░░';
+        if (days >= 180) return '██████░░░░';
+        if (days >= 90) return '████░░░░░░';
+        if (days >= 30) return '██░░░░░░░░';
+        return '█░░░░░░░░░';
+    }
+    
+    /**
+     * Get recommendation based on final score
+     * @param {number} score - Final score
+     * @returns {string} Recommendation text
+     */
+    getRecommendation(score) {
+        if (score < RetroPatientMonitor.DIAGNOSIS_VERY_LOW) {
+            return 'IMMEDIATE MEDICAL ATTENTION REQUIRED';
+        } else if (score < RetroPatientMonitor.DIAGNOSIS_LOW) {
+            return 'REGULAR HEALTH MONITORING ADVISED';
+        } else if (score < RetroPatientMonitor.DIAGNOSIS_AVERAGE) {
+            return 'MAINTAIN CURRENT HEALTH ROUTINE';
+        } else {
+            return 'EXCELLENT HEALTH - CONTINUE GOOD HABITS';
+        }
+    }
+    
+    /**
+     * View patient records from localStorage with enhanced formatting
      */
     viewPatientRecords() {
         try {
@@ -1438,14 +1534,42 @@ DIAGNOSIS: ${session.resultMessage.toUpperCase()}_`;
                 return;
             }
             
-            // Create records display
-            let recordsText = 'PATIENT RECORDS:\n\n';
-            sessions.slice(-5).reverse().forEach((session, index) => {
+            // Create enhanced records display with cards and progress bars
+            let recordsText = 'PATIENT RECORDS:\n';
+            recordsText += '╔══════════════════════════════════════════════════════════════════════════════╗\n';
+            
+            // Get the 5 most recent sessions
+            const recentSessions = sessions.slice(-5).reverse();
+            
+            recentSessions.forEach((session, index) => {
                 const date = new Date(session.timestamp || session.id).toLocaleString();
-                recordsText += `${index + 1}. ${date}\n`;
-                recordsText += `   Heart: ${session.heartScore} | Breath: ${session.breathScore}\n`;
-                recordsText += `   Final: ${session.finalScore} | ${session.resultMessage}\n\n`;
+                const timeOnly = new Date(session.timestamp || session.id).toLocaleTimeString();
+                
+                recordsText += `║ PATIENT ${index + 1}: ${timeOnly.substring(0, 15).padEnd(15)} ${this.getScoreBar(session.finalScore, 100)} ║\n`;
+                recordsText += `║ HEART: ${session.heartScore.toString().padStart(2, '0')}/60 ${this.getScoreBar(session.heartScore, 60)} ║\n`;
+                recordsText += `║ BREATH: ${session.breathScore.toString().padStart(2, '0')}/40 ${this.getScoreBar(session.breathScore, 40)} ║\n`;
+                recordsText += `║ FINAL: ${session.finalScore.toString().padStart(2, '0')}/100 ${this.getScoreBar(session.finalScore, 100)} ║\n`;
+                recordsText += `║ DAYS LEFT: ${session.daysLeft || 'N/A'} ${this.getDaysLeftBar(session.daysLeft)} ║\n`;
+                recordsText += `║ STATUS: ${session.resultMessage.toUpperCase().substring(0, 40).padEnd(40)} ║\n`;
+                recordsText += `║ RECOMMENDATION: ${this.getRecommendation(session.finalScore).substring(0, 30).padEnd(30)} ║\n`;
+                
+                if (index < recentSessions.length - 1) {
+                    recordsText += '╟──────────────────────────────────────────────────────────────────────────────────────────╢\n';
+                }
             });
+            
+            recordsText += '╚══════════════════════════════════════════════════════════════════════════════╝\n';
+            recordsText += `\nTOTAL RECORDS: ${sessions.length} | SHOWING: ${recentSessions.length} MOST RECENT`;
+            
+            // Add health trend analysis
+            if (recentSessions.length >= 2) {
+                const latest = recentSessions[0];
+                const previous = recentSessions[1];
+                const trend = latest.finalScore - previous.finalScore;
+                const trendSymbol = trend > 0 ? '↗' : trend < 0 ? '↘' : '→';
+                const trendText = trend > 0 ? 'IMPROVING' : trend < 0 ? 'DECLINING' : 'STABLE';
+                recordsText += `\nHEALTH TREND: ${trendSymbol} ${trendText} (${trend > 0 ? '+' : ''}${trend} points)`;
+            }
             
             this.showAlert('PATIENT RECORDS', recordsText);
             this.playFeedback('info');
@@ -1477,6 +1601,11 @@ DIAGNOSIS: ${session.resultMessage.toUpperCase()}_`;
     endSessionTimers() {
         // Use centralized cleanup helper which handles session timers
         this.cleanupMonitoringTimers();
+        
+        // Stop microphone if it's still active
+        if (this.microphoneEnabled) {
+            this.stopMicrophone();
+        }
         
         // Reset session state
         this.sessionActive = false;
@@ -2081,6 +2210,12 @@ DIAGNOSIS: ${session.resultMessage.toUpperCase()}_`;
      */
     emergencyStop() {
         this.stopAllMonitoring();
+        
+        // Ensure microphone is stopped during emergency
+        if (this.microphoneEnabled) {
+            this.stopMicrophone();
+        }
+        
         this.showAlert('EMERGENCY STOP', 'ALL MONITORING STOPPED');
         this.playFeedback('critical');
         this.updateDiagnosis('EMERGENCY STOP ACTIVATED_');

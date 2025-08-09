@@ -10,7 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono:wght@400&family=VT323&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style3.css" />
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <div class="crt-monitor">
@@ -205,7 +205,10 @@
                             </div>
                           </div>
                           <div class="graph-message">
-                            <span id="graphMessage">CLICK ANYWHERE IN THIS CARD TO GENERATE HEARTBEAT</span>
+                            <span id="graphMessage"
+                              >CLICK ANYWHERE IN THIS CARD TO GENERATE
+                              HEARTBEAT</span
+                            >
                           </div>
                         </div>
                       </div>
@@ -234,7 +237,9 @@
                                 <div class="bar" data-level="5"></div>
                               </div>
                             </div>
-                            <div class="vital-status" id="heartStatus">WAITING...</div>
+                            <div class="vital-status" id="heartStatus">
+                              WAITING...
+                            </div>
                           </div>
                         </div>
 
@@ -253,7 +258,9 @@
                           <div class="card-body">
                             <div class="vital-display">
                               <div class="vital-value">
-                                <span class="value mood-text" id="moodValue">NEUTRAL</span>
+                                <span class="value mood-text" id="moodValue"
+                                  >NEUTRAL</span
+                                >
                               </div>
                               <div class="mood-indicator">
                                 <div class="mood-bar good"></div>
@@ -261,18 +268,34 @@
                                 <div class="mood-bar bad"></div>
                               </div>
                             </div>
-                            <div class="vital-status" id="moodStatus">BASED ON VITALS</div>
+                            <div class="vital-status" id="moodStatus">
+                              BASED ON VITALS
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
                     <div class="diagnosis-actions">
-                      <input type="file" id="photoUpload" accept="image/*" class="hidden" />
+                      <input
+                        type="file"
+                        id="photoUpload"
+                        accept="image/*"
+                        class="hidden"
+                      />
                       <div class="actions-row">
-                        <button class="pixel-btn" id="uploadPhotoBtn" title="UPLOAD PHOTO">
+                        <button
+                          class="pixel-btn"
+                          id="uploadPhotoBtn"
+                          title="UPLOAD PHOTO"
+                        >
                           <span class="btn-text">UPLOAD PHOTO</span>
                         </button>
-                        <button class="pixel-btn" id="printDeathCert" title="PRINT CERTIFICATE" style="display:none;">
+                        <button
+                          class="pixel-btn"
+                          id="printDeathCert"
+                          title="PRINT CERTIFICATE"
+                          style="display: none"
+                        >
                           <span class="btn-text">PRINT CERT</span>
                         </button>
                       </div>
@@ -316,12 +339,22 @@
                           <div class="btn-led"></div>
                         </button>
                         <div class="breath-extra-controls">
-                          <button class="pixel-btn breath-start"><span class="btn-text">START LISTEN</span></button>
-                          <button class="pixel-btn breath-stop"><span class="btn-text">STOP LISTEN</span></button>
+                          <button class="pixel-btn breath-start">
+                            <span class="btn-text">START LISTEN</span>
+                          </button>
+                          <button class="pixel-btn breath-stop">
+                            <span class="btn-text">STOP LISTEN</span>
+                          </button>
                         </div>
-                        <div class="breath-recognition" id="breathRecognition">RECOGNITION: --</div>
+                        <div class="breath-recognition" id="breathRecognition">
+                          RECOGNITION: --
+                        </div>
                         <div class="breath-graph">
-                          <canvas id="breathCanvas" width="300" height="100"></canvas>
+                          <canvas
+                            id="breathCanvas"
+                            width="300"
+                            height="100"
+                          ></canvas>
                         </div>
                       </div>
                     </div>
@@ -380,8 +413,11 @@
 
     <!-- Session Toast -->
     <div class="pixel-modal hidden" id="toastModal">
-      <div class="modal-content" style="border-color:#00ff41; max-width: 420px;">
-        <div class="modal-header" style="border-bottom-color:#00ff41;">
+      <div
+        class="modal-content"
+        style="border-color: #00ff41; max-width: 420px"
+      >
+        <div class="modal-header" style="border-bottom-color: #00ff41">
           <span class="modal-title" id="toastTitle">SESSION</span>
           <button class="pixel-btn close-btn" onclick="closeToast()">
             <span class="btn-text">X</span>
@@ -400,6 +436,6 @@
       </div>
     </div>
 
-    <script src="script3.js"></script>
+    <script src="script.js"></script>
   </body>
 </html>
