@@ -88,4 +88,7 @@ The project is kept simple with single HTML, CSS, and JS files. We experimented 
 ![Heart/Pulse test](images/pulsetest.png)  
 ![Breath test](images/breathtest.png)
 ![Results](images/testresults.png)
+![Death certificate](images/deathcer.png)
+![All data](images/datasidebar.png)
+![All results](images/allresults.png)
 
