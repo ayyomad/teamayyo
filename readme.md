@@ -49,6 +49,36 @@ Introducing a manual, click-based ECG simulation paired with a microphone-based 
 
 The project is kept simple with single HTML, CSS, and JS files. We experimented with different UI styles before settling on a retro CRT monitor vibe.
 
+## Program Flow
+
+1. **Power On**  
+   Press the Power On button to start a new session.  
+   Each session includes both the Heart Pulse Test and the Breath Test, followed by score calculation and results display.
+
+2. **Read Alert & Continue**  
+   Alerts are shown after each test. Press **Acknowledge** or **Continue** to proceed.
+
+3. **Heart Pulse / ECG Test (15 seconds)**  
+   Place one hand on a pulse or heartbeat source (e.g., chest, wrist).  
+   Use your other hand to click the mouse in sync with the pulse for 15 seconds to track it.
+
+4. **Breath Test (10 seconds)**  
+   Allow microphone access when prompted.  
+   Breathe normally into the mic for 10 seconds while the system records breath volume and quality.
+
+5. **Results Display**  
+   After both tests, your results are shown:  
+   - Heart Test outcome  
+   - Breath Test outcome  
+   - Estimated “Days Left to Live” (based on your performance)
+
+6. **Death Certificate (Optional)**  
+   Click the **Print Death Certificate** button.  
+   Upload a photo to generate a personalized, fully “official” PDF.
+
+7. **View Results Later**  
+   Past results for the current session can be viewed in the **Patient Dashboard** by clicking the **Sidebar Results** button.
+
 ---
 
 ## Screenshots  
