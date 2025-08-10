@@ -83,7 +83,9 @@ The project is kept simple with single HTML, CSS, and JS files. We experimented 
 
 ## Screenshots  
 
-![Breath Test](images/demo (1).jpg)  
-![Heart Test](images/demo (2).jpg)  
-![Data Display](images/demo (3).jpg)  
-![Alert Message](images/demo (4).jpg)  
+![Power on](images/poweron.png)  
+![Alert messeges](images/alertbox.png)  
+![Heart/Pulse test](images/pulsetest.png)  
+![Breath test](images/breathtest.png)
+![Results](images/testresults.png)
+
