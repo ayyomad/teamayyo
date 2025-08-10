@@ -1,5 +1,6 @@
 # Click2Care  
 *Soul-touching patient monitor*
+[Click here to view the live site](https://click2care.netlify.app/)
 
 ---
 
